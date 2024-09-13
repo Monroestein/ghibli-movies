@@ -4,25 +4,22 @@
     <main>
         <h1>Hi, {{ user }} !</h1>
 
-        <details>
-            <summary>Pick a movie:</summary>
-            <ul v-for="movie in movies" v-bind:key="movie.id">
-                <li>{{movies.title}}</li>
-            </ul>
-                <!-- <input type="button" value=":D" @click="fetchMovie"> -->
-        </details>
+        <select @change="showMovie">
+                <option value="">Pick movie</option>
+                <option v-for="movie in movies" :key="movie.id" :value="movie.id">{{ movie.title }}</option>
+        </select>
 
-        <section class="movie_section" v-if="movies.id != ''">
+        <section class="movie_section" v-if="selectedFilm!=null">
 
             <div class="movie_left">
-                <img :src="movies.image" alt="">
+                <img :src="selectedFilm.image" alt="">
             </div>
 
             <div class="movie_right">
-                <h1>{{ movies.originalTitle }}</h1>
-                <h2>{{ movies.title }}</h2>
-                <h5>{{ movies.releaseDate }}</h5>
-                <p>{{ movies.description }}</p>
+                <h1>{{ selectedFilm.original_title }}</h1>
+                <h2>{{ selectedFilm.title }}</h2>
+                <h5>{{ selectedFilm.release_date }}</h5>
+                <p>{{ selectedFilm.description }}</p>
             </div>
 
         </section>
@@ -42,14 +39,17 @@ export default {
     },
     data: function(){
         return {
-            movies:{
-                id: "",
-                originalTitle: "",
-                title: "",
-                image: "",
-                description: "",
-                releaseDate: ""
-            }
+            movies:[
+            //     {
+            //     id: '',
+            //     originalTitle: '',
+            //     title: "",
+            //     image: "",
+            //     description: "",
+            //     releaseDate: ""
+            // }
+        ],
+        selectedFilm: null
         }
     },
     // computed: {},
@@ -58,8 +58,19 @@ export default {
             try {
 
                 const response = await fetch("https://ghibliapi.vercel.app/films/");
+
+                if (!response.ok){
+                    if (response.status===404){
+                        alert(`Movie not found.`);
+                        return;
+                    }
+                    else {
+                        throw new Error(`HTTP Error`+response.status)
+                    }
+                }
+
                 const json = await response.json();
-                // console.log(json)
+                console.log(json)
                 this.addMovie(json)
                 
             } catch (error) {
@@ -70,6 +81,12 @@ export default {
         addMovie(movieData){
             this.movies = movieData;
             console.log(movieData)
+        },
+        showMovie(event){
+            const id = event.target.value
+            this.selectedFilm = this.movies.find((movie)=>{
+                return movie.id==id
+            })
         }
     },
     // watch: {},
@@ -77,32 +94,44 @@ export default {
     // mixins: [],
     // filters: {},
     // -- Lifecycle Methods
+    created(){
+        this.fetchMovie()
+    }
     // -- End Lifecycle Methods
 }
 </script>
 
 <style scoped>
+
+main{
+    font-size: .8rem;
+}
     
-details {
-    margin: 30px auto 80px auto;
-    border: 1px solid #c5e2d9;
-    border-radius: 3px;
-    padding: 0.5em 0.5em 0;
-    max-width: 700px;
+.movie_section{
+    margin: 60px auto;
+    width: 40%;
+    display: flex;
+    align-items: stretch;
+    text-align: start;
+    gap: 60px;
 }
 
-summary {
-    font-weight: bold;
-    margin: -0.5em -0.5em 0;
-    padding: 0.5em;
+.movie_left{
+    width: 40%;
 }
 
-details[open] {
-    padding: 0.5em;
+.movie_left img{
+  width: 100%;
 }
 
-details[open] summary {
-    /* border-bottom: 1px solid #aaa; */
-    margin-bottom: 0.5em;
+.movie_right{
+    width: 40%;
 }
+
+.movie_right h1{
+    font-size: 400%;
+}
+
+
+
 </style>

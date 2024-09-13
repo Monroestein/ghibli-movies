@@ -4,8 +4,9 @@
             <h1>Ghibli Movies</h1>
         </div>
         <div class="input_container">
-            <input v-model="firstName" type="text" placeholder="First name">
-            <input v-model="lastName" type="text" placeholder="Last name">
+            <p>Here you'll find information about Studio Ghibli movies.</p>
+            <input v-model="firstName" id="firstName" type="text" placeholder="First name">
+            <input v-model="lastName" id="lastName" type="text" placeholder="Last name">
             <input @click="saveUser" type="button" value="Send">
         </div>
     </section>
@@ -62,6 +63,7 @@ h1{
     text-align: center;
     line-height: 160px;
     letter-spacing: -15px;
+    /* -webkit-text-stroke: 2px #413a29; */
 }
 
 .input_container{
